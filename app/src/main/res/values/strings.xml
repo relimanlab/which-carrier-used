@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Which Carrier Used</string>
+    <string name="app_description">現在使用中のキャリア情報を表示しています</string>
+    <string name="channel_name">キャリア情報</string>
+    <string name="channel_description">現在のデータ通信キャリアを表示</string>
+    <string name="notification_title">データ通信キャリア</string>
+    <string name="unknown_carrier">不明なキャリア</string>
+    <string name="error_getting_carrier">キャリア情報の取得に失敗しました</string>
+</resources>
