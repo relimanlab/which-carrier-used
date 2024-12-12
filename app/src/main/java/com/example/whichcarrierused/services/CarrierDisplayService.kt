@@ -77,19 +77,20 @@ class CarrierDisplayService : Service() {
         val firstChar = carrierName.firstOrNull()?.uppercaseChar() ?: return R.drawable.ic_network
         
         return when (firstChar) {
-            'A' -> R.drawable.ic_carrier_a
-            'D' -> R.drawable.ic_carrier_d
-            'I' -> R.drawable.ic_carrier_i
-            'K' -> R.drawable.ic_carrier_k
-            'L' -> R.drawable.ic_carrier_l
-            'P' -> R.drawable.ic_carrier_p
-            'R' -> R.drawable.ic_carrier_r
-            'S' -> R.drawable.ic_carrier_s
-            'T' -> R.drawable.ic_carrier_t
-            'U' -> R.drawable.ic_carrier_u
-            'V' -> R.drawable.ic_carrier_v
-            'Y' -> R.drawable.ic_carrier_y
-            else -> R.drawable.ic_network
+            'A' -> R.drawable.ic_carrier_a  // au, ASUS等
+            'D' -> R.drawable.ic_carrier_d  // docomo等
+            'I' -> R.drawable.ic_carrier_i  // IIJmobile等
+            'K' -> R.drawable.ic_carrier_k  // KDDI等
+            'L' -> R.drawable.ic_carrier_l  // Linemo等
+            'N' -> R.drawable.ic_carrier_n  // NTT docomo等
+            'P' -> R.drawable.ic_carrier_p  // povo等
+            'R' -> R.drawable.ic_carrier_r  // Rakuten等
+            'S' -> R.drawable.ic_carrier_s  // SoftBank等
+            'T' -> R.drawable.ic_carrier_t  // T-Mobile等
+            'U' -> R.drawable.ic_carrier_u  // UQ mobile等
+            'V' -> R.drawable.ic_carrier_v  // Vodafone等
+            'Y' -> R.drawable.ic_carrier_y  // Y!mobile等
+            else -> R.drawable.ic_network   // その他
         }
     }
 
