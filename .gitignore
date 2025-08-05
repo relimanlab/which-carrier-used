@@ -13,3 +13,5 @@
 .externalNativeBuild
 .cxx
 local.properties
+studiobot.xml
+AndroidProjectSystem.xml
