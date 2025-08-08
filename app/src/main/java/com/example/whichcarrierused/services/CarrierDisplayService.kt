@@ -1,14 +1,11 @@
 package com.example.whichcarrierused.services
 
-import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.pm.ServiceInfo
-import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
@@ -26,7 +23,7 @@ class CarrierDisplayService : Service() {
     private lateinit var updateRunnable: Runnable
     private var lastCarrierName: String? = null
     private var lastNotificationTime: Long = 0
-
+    
     companion object {
         private const val NOTIFICATION_ID = 1
         private const val CHANNEL_ID = "carrier_info"
@@ -38,7 +35,7 @@ class CarrierDisplayService : Service() {
         createNotificationChannel()
         subscriptionManager = getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
         telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-
+        
         handler = Handler(Looper.getMainLooper())
         updateRunnable = Runnable {
             displayDefaultDataCarrier()
@@ -47,16 +44,6 @@ class CarrierDisplayService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // Android 13以降の通知権限チェック
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ActivityCompat.checkSelfPermission(this,
-                    Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                Log.w("CarrierDisplayService", "通知権限が付与されていません")
-                stopSelf()
-                return START_NOT_STICKY
-            }
-        }
-
         handler.post(updateRunnable)
         return START_STICKY
     }
@@ -68,16 +55,16 @@ class CarrierDisplayService : Service() {
 
     private fun displayDefaultDataCarrier() {
         try {
-            if (ActivityCompat.checkSelfPermission(this,
-                    android.Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
-
+            if (ActivityCompat.checkSelfPermission(this, 
+                android.Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+                
                 val defaultDataSubId = SubscriptionManager.getDefaultDataSubscriptionId()
                 val activeSubscriptionInfo = subscriptionManager.getActiveSubscriptionInfo(defaultDataSubId)
-
-                val carrierName = activeSubscriptionInfo?.carrierName ?:
-                telephonyManager.simOperatorName ?:
-                getString(R.string.unknown_carrier)
-
+                
+                val carrierName = activeSubscriptionInfo?.carrierName ?: 
+                                 telephonyManager.simOperatorName ?: 
+                                 getString(R.string.unknown_carrier)
+                
                 showCarrierNotification(carrierName.toString())
             }
         } catch (e: Exception) {
@@ -88,7 +75,7 @@ class CarrierDisplayService : Service() {
 
     private fun getCarrierIcon(carrierName: String): Int {
         val firstChar = carrierName.firstOrNull()?.uppercaseChar() ?: return R.drawable.ic_network
-
+        
         return when (firstChar) {
             'A' -> R.drawable.ic_carrier_a  // au, ASUS等
             'D' -> R.drawable.ic_carrier_d  // docomo等
@@ -120,7 +107,7 @@ class CarrierDisplayService : Service() {
             setSound(null, null)
             lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
         }
-
+        
         val notificationManager = getSystemService(NotificationManager::class.java)
         notificationManager.createNotificationChannel(channel)
     }
@@ -129,7 +116,7 @@ class CarrierDisplayService : Service() {
         try {
             val iconResId = getCarrierIcon(carrierName)
             val currentTime = System.currentTimeMillis()
-
+            
             // キャリア名が変更された場合のみ時間を更新
             if (carrierName != lastCarrierName) {
                 lastCarrierName = carrierName
@@ -143,24 +130,15 @@ class CarrierDisplayService : Service() {
                 .setPriority(NotificationCompat.PRIORITY_MAX)  // 優先度を最大に設定
                 .setOngoing(true)
                 .setOnlyAlertOnce(true)
-                .setSilent(true)  // setSound(null)とsetVibrate(null)の代わりに使用
+                .setSound(null)
+                .setVibrate(null)
                 .setWhen(lastNotificationTime)
                 .setShowWhen(true)
-                .setCategory(NotificationCompat.CATEGORY_SERVICE)  // CATEGORY_STATUS から変更
+                .setCategory(NotificationCompat.CATEGORY_STATUS)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
                 .build()
 
-            // Android 14以降でのForeground Service Type指定
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                startForeground(
-                    NOTIFICATION_ID,
-                    notification,
-                    ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
-                )
-            } else {
-                startForeground(NOTIFICATION_ID, notification)
-            }
+            startForeground(NOTIFICATION_ID, notification)
         } catch (e: Exception) {
             Log.e("CarrierDisplayService", "Error showing notification", e)
             val notification = NotificationCompat.Builder(this, CHANNEL_ID)
@@ -170,22 +148,15 @@ class CarrierDisplayService : Service() {
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setOngoing(true)
                 .setOnlyAlertOnce(true)
-                .setSilent(true)
+                .setSound(null)
+                .setVibrate(null)
                 .setWhen(lastNotificationTime)
                 .setShowWhen(true)
-                .setCategory(NotificationCompat.CATEGORY_SERVICE)
+                .setCategory(NotificationCompat.CATEGORY_STATUS)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .build()
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                startForeground(
-                    NOTIFICATION_ID,
-                    notification,
-                    ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
-                )
-            } else {
-                startForeground(NOTIFICATION_ID, notification)
-            }
+            startForeground(NOTIFICATION_ID, notification)
         }
     }
 
